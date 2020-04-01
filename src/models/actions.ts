@@ -5,6 +5,10 @@ export type EnterLeaveHookAction<T> = (
   context: EnterLeaveHookContext<T>
 ) => void | Message | Promise<void> | Promise<Message>;
 
+export type EnterLeaveListener<T> = (
+  context: EnterLeaveHookContext<T>
+) => void | Promise<void>;
+
 export type TransitionHookAction<T> = (
   context: TransitionHookContext<T>
 ) => void | Message | Promise<void> | Promise<Message>;

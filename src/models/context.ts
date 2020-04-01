@@ -8,6 +8,7 @@ interface BaseContext<T> {
     | 'light-guard'
     | 'full-guard';
   stateData?: T;
+  alterStateData: (next: T) => void;
   // TODO: Type correctly
   getStateMachine: () => unknown;
 }

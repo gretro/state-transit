@@ -1,11 +1,13 @@
-import { EnterLeaveHookAction } from './actions';
+import { EnterLeaveHookAction, EnterLeaveListener } from './actions';
 import { EnterLeaveHookContext } from './context';
 
 interface BaseState<T> {
   name: string;
   type: 'interim' | 'choice' | 'end';
   onEnter?: EnterLeaveHookAction<T>;
+  onEnterListener?: EnterLeaveListener<T>;
   onLeave?: EnterLeaveHookContext<T>;
+  onLeaveListener?: EnterLeaveListener<T>;
 }
 
 export type State<T> = InterimState<T> | ChoiceState<T> | EndState<T>;
@@ -23,4 +25,5 @@ export interface ChoiceState<T> extends BaseState<T> {
 export interface EndState<T> extends BaseState<T> {
   type: 'end';
   onLeave?: undefined;
+  onLeaveListener?: undefined;
 }
