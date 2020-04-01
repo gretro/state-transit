@@ -1,7 +1,7 @@
 {
   "name": "state-transit",
   "version": "0.1.0",
-  "description": "Move your javascript state with State Transit",
+  "description": "Move your Javascript state with State Transit",
   "main": "lib/index.js",
   "scripts": {
     "prebuild": "rimraf lib",
