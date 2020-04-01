@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es5",
+    "alwaysStrict": true,
+    "declaration": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "lib": ["ES5", "DOM"],
+    "rootDir": "src",
+    "outDir": "lib",
+    "suppressImplicitAnyIndexErrors": true,
+    "skipDefaultLibCheck": true
+  },
+  "exclude": ["**/*.spec.ts", "lib"]
+}
