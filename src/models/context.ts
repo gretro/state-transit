@@ -1,4 +1,5 @@
 import { Message } from './message';
+import { StateSnapshot } from './state-snapshot';
 
 interface BaseContext<T> {
   event:
@@ -7,10 +8,11 @@ interface BaseContext<T> {
     | 'leave-hook'
     | 'light-guard'
     | 'full-guard';
-  stateData?: T;
+  stateContext: StateSnapshot<T>;
+}
+
+export interface AlterableBaseContext<T> extends BaseContext<T> {
   alterStateData: (next: T) => void;
-  // TODO: Type correctly
-  getStateMachine: () => unknown;
 }
 
 interface WithMessage {

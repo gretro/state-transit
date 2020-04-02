@@ -1,9 +1,5 @@
 import { Guard } from './guards';
-import {
-  TransitionHookAction,
-  TransitionFailureHookListener,
-  TransitionSuccessHookListener,
-} from './actions';
+import { TransitionHookAction } from './actions';
 
 export interface Transition<T> {
   onEvent: string;
@@ -11,6 +7,5 @@ export interface Transition<T> {
   target: string;
   guards?: Guard<T>[];
   beforeGuardsAction?: TransitionHookAction<T>;
-  onFailureListener?: TransitionFailureHookListener<T>;
-  onSuccessListener?: TransitionSuccessHookListener<T>;
+  onSuccessAction?: TransitionHookAction<T>;
 }
