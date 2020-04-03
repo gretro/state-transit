@@ -1,43 +1,32 @@
 import { StateMachineConfig } from './state-machine-config';
-import {
-  State,
-  InterimState,
-  Transition,
-  ChoiceState,
-  Guard,
-  EndState,
-} from '../models';
+import { State, InterimState, Transition, ChoiceState, Guard, EndState } from '../models';
 
-// TODO: Unit test this validation
-export function validateConfiguration(
-  config: StateMachineConfig<unknown>
-): string[] {
+export const NO_CONFIG_ERROR = 'No configuration provided';
+export const NO_STATES_ERROR = 'No valid states were provided in the configuration';
+export const INVALID_INITIAL_STATE_ERROR = 'Initial state is not a valid state';
+export const INITIAL_STATE_NOT_DEFINED_ERROR = 'Initial state is not defined';
+
+export function validateConfiguration(config: StateMachineConfig<unknown>): string[] {
   const errors = [];
 
   if (!config) {
-    errors.push('No configuration provided');
+    errors.push(NO_CONFIG_ERROR);
     return errors;
   }
 
-  if (!config.states || config.states.length === 0) {
-    errors.push('No states were provided in the configuration');
+  if (!config.states || !Array.isArray(config.states) || config.states.length === 0) {
+    errors.push(NO_STATES_ERROR);
     return errors;
   }
 
   if (config.initialState) {
-    const hasValidInitialState = config.states.some(
-      (state) => state.name === config.initialState
-    );
+    const hasValidInitialState = config.states.some((state) => state.name === config.initialState);
 
     if (!hasValidInitialState) {
-      errors.push('Initial state is not a valid state');
+      errors.push(INVALID_INITIAL_STATE_ERROR);
     }
   } else {
-    if (config.autoStart) {
-      errors.push(
-        'Cannot auto start state machine as no initial state was defined'
-      );
-    }
+    errors.push(INITIAL_STATE_NOT_DEFINED_ERROR);
   }
 
   const allStateNames = config.states.map((state) => state.name);
@@ -49,10 +38,7 @@ export function validateConfiguration(
   return errors;
 }
 
-function validateStateConfiguration(
-  state: State<unknown>,
-  allStateNames: string[]
-): string[] {
+function validateStateConfiguration(state: State<unknown>, allStateNames: string[]): string[] {
   if (!state || typeof state !== 'object') {
     return ['Invalid state'];
   }
@@ -103,10 +89,7 @@ function validateStateConfiguration(
   return errors.map((error) => `[State ${stateName}] ${error}`);
 }
 
-function validateInterimState(
-  interimState: InterimState<unknown>,
-  allStateNames: string[]
-): string[] {
+function validateInterimState(interimState: InterimState<unknown>, allStateNames: string[]): string[] {
   const errors: string[] = [];
 
   if (!interimState.transitions || interimState.transitions.length === 0) {
@@ -114,11 +97,8 @@ function validateInterimState(
   }
 
   interimState.transitions.forEach((transition) => {
-    const transitionName = `${transition.source} -> ${transition.target}`;
-    const transitionErrors = validateInterimTransition(
-      transition,
-      allStateNames
-    );
+    const transitionName = `${interimState.name} -> ${transition.target}`;
+    const transitionErrors = validateInterimTransition(transition, allStateNames);
 
     transitionErrors.forEach((transitError) => {
       errors.push(`[Transition ${transitionName}] ${transitError}`);
@@ -128,10 +108,7 @@ function validateInterimState(
   return errors.map((err) => `[State ${interimState.name}] ${err}`);
 }
 
-function validateInterimTransition(
-  transition: Transition<unknown>,
-  allStateNames: string[]
-): string[] {
+function validateInterimTransition(transition: Transition<unknown>, allStateNames: string[]): string[] {
   const errors: string[] = [];
 
   if (!transition || typeof transition !== 'object') {
@@ -143,20 +120,12 @@ function validateInterimTransition(
     errors.push('onEvent must be defined');
   }
 
-  const sourceIndex = allStateNames.indexOf(transition.source);
-  if (sourceIndex < 0) {
-    errors.push('Invalid source on transition');
-  }
-
   const targetIndex = allStateNames.indexOf(transition.target);
   if (targetIndex < 0) {
     errors.push(`Invalid target on transition`);
   }
 
-  if (
-    transition.onSuccessAction &&
-    typeof transition.onSuccessAction !== 'function'
-  ) {
+  if (transition.onSuccessAction && typeof transition.onSuccessAction !== 'function') {
     errors.push('onSuccessAction is defined, but is not a function');
   }
 
@@ -199,10 +168,7 @@ function validateGuard(guard: Guard<unknown>): string[] {
   return errors.map((err) => `[Guard "${guardId}"] ${err}`);
 }
 
-function validateChoiceState(
-  choiceState: ChoiceState<unknown>,
-  allStateNames: string[]
-): string[] {
+function validateChoiceState(choiceState: ChoiceState<unknown>, allStateNames: string[]): string[] {
   const errors: string[] = [];
 
   if (choiceState.choices && choiceState.choices.length > 0) {
@@ -233,9 +199,7 @@ function validateChoiceState(
           errors.push('No fallback choice with no guard');
         }
       } else if (!isLastItem) {
-        errors.push(
-          'Fallback choice (no guard) is not the last choice. All other choices are unreachable'
-        );
+        errors.push('Fallback choice (no guard) is not the last choice. All other choices are unreachable');
       }
     });
   } else {
