@@ -1,8 +1,4 @@
-import {
-  TransitionFailureHookListener,
-  TransitionSuccessHookListener,
-  EnterLeaveListener,
-} from '../models/actions';
+import { TransitionFailureHookListener, TransitionSuccessHookListener, EnterLeaveListener } from '../models/actions';
 
 export interface StateMachineListeners<T> {
   onTransitionFailure?: TransitionFailureHookListener<T>;

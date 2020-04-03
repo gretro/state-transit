@@ -2,12 +2,7 @@ import { Message } from './message';
 import { StateSnapshot } from './state-snapshot';
 
 interface BaseContext<T> {
-  event:
-    | 'transition-hook'
-    | 'enter-hook'
-    | 'leave-hook'
-    | 'light-guard'
-    | 'full-guard';
+  event: 'transition-hook' | 'enter-hook' | 'leave-hook' | 'light-guard' | 'full-guard';
   stateContext: StateSnapshot<T>;
 }
 

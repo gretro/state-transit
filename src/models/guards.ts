@@ -24,6 +24,4 @@ export interface GuardEvaluationResult {
   reason?: string;
 }
 
-export type GuardEvaluation<TContext> = (
-  context: TContext
-) => GuardEvaluationResult | Promise<GuardEvaluationResult>;
+export type GuardEvaluation<TContext> = (context: TContext) => GuardEvaluationResult | Promise<GuardEvaluationResult>;
