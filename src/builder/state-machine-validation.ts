@@ -5,6 +5,10 @@ export const NO_CONFIG_ERROR = 'No configuration provided';
 export const NO_STATES_ERROR = 'No valid states were provided in the configuration';
 export const INVALID_INITIAL_STATE_ERROR = 'Initial state is not a valid state';
 export const INITIAL_STATE_NOT_DEFINED_ERROR = 'Initial state is not defined';
+export const INVALID_STATE_TYPE_ERROR = 'Invalid state type. A state should be an object';
+export const STATE_NAME_UNDEFINED = 'State name is not defined or is not a string';
+export const ON_ENTER_INVALID_TYPE_ERROR = 'OnEnter must either be undefined, null or a function';
+export const ON_LEAVE_INVALID_TYPE_ERROR = 'OnLeave must either be undefined, null or a function';
 
 export function validateConfiguration(config: StateMachineConfig<unknown>): string[] {
   const errors = [];
@@ -29,7 +33,7 @@ export function validateConfiguration(config: StateMachineConfig<unknown>): stri
     errors.push(INITIAL_STATE_NOT_DEFINED_ERROR);
   }
 
-  const allStateNames = config.states.map((state) => state.name);
+  const allStateNames = config.states.map((state) => state?.name);
   config.states.forEach((state) => {
     const stateErrors = validateStateConfiguration(state, allStateNames);
     errors.push(...stateErrors);
@@ -39,51 +43,51 @@ export function validateConfiguration(config: StateMachineConfig<unknown>): stri
 }
 
 function validateStateConfiguration(state: State<unknown>, allStateNames: string[]): string[] {
-  if (!state || typeof state !== 'object') {
-    return ['Invalid state'];
+  if (!state || typeof state !== 'object' || Array.isArray(state)) {
+    return [INVALID_STATE_TYPE_ERROR];
   }
 
-  const stateName = state.name || '<undefined>';
+  const stateName = state.name && typeof state.name === 'string' ? state.name : '<undefined>';
   const errors: string[] = [];
 
-  if (!state.name) {
-    errors.push('State name not defined');
+  if (!state.name || typeof state.name !== 'string') {
+    errors.push(STATE_NAME_UNDEFINED);
+  }
+
+  if (state.onEnter != null && typeof state.onEnter !== 'function') {
+    errors.push(ON_ENTER_INVALID_TYPE_ERROR);
+  }
+
+  if (state.onLeave != null && typeof state.onLeave !== 'function') {
+    errors.push(ON_LEAVE_INVALID_TYPE_ERROR);
   }
 
   if (!state.type) {
     errors.push('Type not defined');
-  }
+  } else {
+    switch (state.type) {
+      case 'interim': {
+        const interimErrors = validateInterimState(state, allStateNames);
+        errors.push(...interimErrors);
+        break;
+      }
 
-  if (state.onEnter && typeof state.onEnter !== 'function') {
-    errors.push('onEnter is not a function');
-  }
+      case 'choice': {
+        const choiceErrors = validateChoiceState(state, allStateNames);
+        errors.push(...choiceErrors);
+        break;
+      }
 
-  if (state.onLeave && typeof state.onLeave !== 'function') {
-    errors.push('onLeave is not a function');
-  }
+      case 'end': {
+        const endErrors = validateEndErrors(state);
+        errors.push(...endErrors);
+        break;
+      }
 
-  switch (state.type) {
-    case 'interim': {
-      const interimErrors = validateInterimState(state, allStateNames);
-      errors.push(...interimErrors);
-      break;
+      default:
+        errors.push(`Unknown state type`);
+        break;
     }
-
-    case 'choice': {
-      const choiceErrors = validateChoiceState(state, allStateNames);
-      errors.push(...choiceErrors);
-      break;
-    }
-
-    case 'end': {
-      const endErrors = validateEndErrors(state);
-      errors.push(...endErrors);
-      break;
-    }
-
-    default:
-      errors.push(`Unknown state type`);
-      break;
   }
 
   return errors.map((error) => `[State ${stateName}] ${error}`);

@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as StateMachineValidation from './state-machine-validation';
 import { StateMachineConfig } from './state-machine-config';
+import {
+  undefinedTestCase,
+  nullTestCase,
+  emptyArrayTestCase,
+  emptyStringTestCase,
+} from './state-machine-state-validation.utils';
 
-const undefinedTestCase = { value: undefined, id: 'undefined' };
-const nullTestCase = { value: undefined, id: 'null' };
-const emptyStringTestCase = { value: '', id: 'empty' };
-const emptyArrayTestCase = { value: [], id: 'empty array' };
-
-describe('State machine validation', () => {
+describe('State machine configuration validation', () => {
   describe('No configuration', () => {
     [undefinedTestCase, nullTestCase].forEach((testCase) => {
       it(`When ${testCase.id} is passed as configuration, should fail validation`, () => {
